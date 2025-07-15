@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JWT Login</title>
+</head>
+<body>
+  <h2>Login Form</h2>
+  <form id="loginForm">
+    <label>Username:</label>
+    <input type="text" name="username" required><br><br>
+
+    <label>Password:</label>
+    <input type="password" name="password" required><br><br>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const loginData = {
+        username: formData.get("username"),
+        password: formData.get("password")
+      };
+
+      try {
+        const response = await fetch("/api/token/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(loginData)
+        });
+
+        if (!response.ok) {
+          alert("Login failed! Check your username and password.");
+          return;
+        }
+
+        const data = await response.json();
+
+        // Store tokens in localStorage
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+
+        alert("Login successful!");
+        // Redirect or load user content
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+      }
+    });
+  </script>
+</body>
+</html>

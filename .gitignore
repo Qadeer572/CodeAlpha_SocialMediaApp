@@ -1,5 +1,21 @@
-echo "media/" >> .gitignore
-echo "*.sqlite3" >> .gitignore
-git rm -r --cached media/
-git add .gitignore
-git commit -m "Ignore media and large files"
+# Django
+*.pyc
+__pycache__/
+*.sqlite3
+db.sqlite3
+
+# Media
+media/
+*.mp4
+*.jpg
+*.png
+
+# Environment
+.env
+
+# Node/Frontend
+node_modules/
+dist/
+
+# OS files
+.DS_Store

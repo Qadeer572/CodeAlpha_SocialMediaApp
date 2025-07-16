@@ -1,0 +1,5 @@
+echo "media/" >> .gitignore
+echo "*.sqlite3" >> .gitignore
+git rm -r --cached media/
+git add .gitignore
+git commit -m "Ignore media and large files"

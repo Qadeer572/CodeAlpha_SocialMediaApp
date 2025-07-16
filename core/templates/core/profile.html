@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-
+{% load static %}
 {% block title %}
     {{ user.username }}'s Profile
 {% endblock title %}
@@ -9,25 +9,25 @@
     <div class="row">
         <!-- Profile Picture and Basic Info -->
         <div class="col-md-4 text-center">
-            <img src="{{ profile.profile_picture.url }}" 
-                 class="rounded-circle img-fluid mb-3" 
-                 alt="{{ user.username }}'s profile picture"
-                 style="width: 150px; height: 150px; object-fit: cover;">
+            <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'logo.jpg' %}{% endif %}" 
+                    class="rounded-circle img-fluid mb-3" 
+                    alt="{{ user.username }}'s profile picture"
+                    style="width: 150px; height: 150px; object-fit: cover;">
             <h2>{{ user.username }}</h2>
             <p class="text-muted">{{ profile.bio|default:"No bio yet" }}</p>
 
             <!-- Follower/Following Counts -->
             <div class="d-flex justify-content-center gap-4 mb-3">
                 <div>
-                    <strong>{{ followers.count }}</strong>
+                    <strong>{{ followers}}</strong>
                     <span class="text-muted">Followers</span>
                 </div>
                 <div>
-                    <strong>{{ following.count }}</strong>
+                    <strong>{{ following }}</strong>
                     <span class="text-muted">Following</span>
                 </div>
                 <div>
-                    <strong>{{ user.posts.count }}</strong>
+                    <strong>{{ posts.count }}</strong>
                     <span class="text-muted">Posts</span>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 <form method="POST" action="{% url 'follow_toggle' user.username %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-{% if request.user in user.profile.followers.all %}secondary{% else %}primary{% endif %} mb-3">
-                        {% if request.user in user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
+                        {% if request.user in profile.followers.all %}Unfollow{% else %}Follow{% endif %}
                     </button>
                 </form>
             {% else %}
@@ -48,29 +48,38 @@
         <!-- User Posts -->
         <div class="col-md-8">
             <h3 class="mb-4">Recent Posts</h3>
-            {% for post in user.posts.all|slice:":10" %}
+            {% for post in posts.all|slice:":10" %}
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
-                                 class="rounded-circle me-2" 
-                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            <img src="{% if profile and profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'logo.jpg' %}{% endif %}" 
+                                class="rounded-circle me-2" 
+                                style="width: 40px; height: 40px; object-fit: cover;">
                             <div>
                                 <strong>{{ user.username }}</strong>
                                 <small class="text-muted">{{ post.created_at|timesince }} ago</small>
                             </div>
                         </div>
                         <p class="card-text">{{ post.content|truncatewords:50 }}</p>
-                        {% if post.type == 'media' and post.media %}
-                            <img src="#" class="img-fluid rounded mb-2" alt="Post image">
+                        {% if post.type == 'image' and post.media %}
+                            <img src="{{post.media.url}}" class="img-fluid rounded mb-2" alt="Post image">
                         {% endif %}
+                        {% if post.type == 'video' and post.media %}
+                            <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
+                                <video controls style="width: 100%; height: 100%; object-fit: cover;">
+                                    <source src="{{ post.media.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        {% endif %}
+
                         <div class="d-flex gap-3">
                             <a href="#" class="btn btn-sm btn-outline-primary">View Post</a>
                             {% if user == request.user %}
                                 <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
                                 <form method="POST" action="#" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    <button type="submit" id="{{post.id}}" class="btn btn-sm btn-outline-danger">Delete</button>
                                 </form>
                             {% endif %}
                         </div>

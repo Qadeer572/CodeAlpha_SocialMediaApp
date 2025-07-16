@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from .forms import CustomeUserRegistrationForm,UserLoginForm
+from Posts.models import profile
 
 
 # Create your views here.
@@ -39,6 +40,11 @@ def register(request):
         form = CustomeUserRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
+            current_user=User.objects.get(username=form.cleaned_data['username'])
+            profile.objects.create(
+                user=current_user,
+                profile_picture='profile_pictures/logo1.jpg'  # or 'profile_pictures/logo1.jpg' if in subfolder
+            )
             return redirect('/users/login')  # redirect to login after successful signup
     else:
         form = CustomeUserRegistrationForm()

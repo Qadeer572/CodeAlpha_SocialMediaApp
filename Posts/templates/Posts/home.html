@@ -5,82 +5,156 @@
 {% endblock title %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container mt-5">
+    <!-- Tabs: Following | For You -->
+    <ul class="nav nav-tabs mb-4" id="feedTabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="following-tab" href="#" onclick="showTab('following')">Following</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="foryou-tab" href="#" onclick="showTab('foryou')">For You</a>
+        </li>
+    </ul>
 
-  <!-- Tabs: Following | For You -->
-  <ul class="nav nav-tabs mb-4" id="feedTabs">
-    <li class="nav-item">
-      <a class="nav-link active" id="following-tab" href="#" onclick="showTab('following')">Following</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="foryou-tab" href="#" onclick="showTab('foryou')">For You</a>
-    </li>
-  </ul>
+    <!-- Posts Container -->
+    <div class="d-flex justify-content-center">
+        <div style="max-width: 600px; width: 100%">
 
-  <!-- Posts Container -->
-  <div class="d-flex justify-content-center">
-    <div style="max-width: 600px; width: 100%">
-
-      <!-- Following Post: Has image -->
-      <div id="following-section">
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="Profile">
-              <strong>John Doe</strong>
+            <!-- Following Posts -->
+            <div id="following-section">
+                {% for post in following_posts %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{% if post.profile.profile_picture %}{{ post.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
+                                     class="rounded-circle me-2" 
+                                     alt="{{ post.post.user.username }}'s profile"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                <strong>{{ post.post.user.username }}</strong>
+                            </div>
+                            {% if post.post.user != request.user %}
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                        {% if request.user in post.user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2 fw-normal">{{ post.post.content|truncatewords:50 }}</p>
+                            {% if post.post.type == 'image' %}
+                                <img src="{{post.post.media.url}}" 
+                                     class="img-fluid rounded mb-2" 
+                                     alt="{{ post.post..user.username }}'s post image">
+                            {% endif %}
+                            {% if post.post.type == 'video' %}
+                                <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
+                                    <video controls style="width: 100%; height: 100%; object-fit: cover;">
+                                        <source src="{{ post.post.media.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex gap-3">
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    ❤️ {{ post.likes.count }} Like{% if post.likes.count != 1 %}s{% endif %}
+                                </button>
+                            </form>
+                            <a href="" class="btn btn-outline-secondary btn-sm">💬 Comment</a>
+                            {% if post.user == request.user %}
+                                <a href="" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                <form method="POST" action="" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center">No posts from people you follow.</p>
+                {% endfor %}
             </div>
-            <button class="btn btn-outline-primary btn-sm">Follow</button>
-          </div>
-          <div class="card-body">
-            <!-- Description -->
-            <p class="mb-2 fw-normal">This is a following post with an image below.</p>
-            <!-- Image -->
-            <img src="/static/WhatsApp Image 2023-10-08 at 3.53.53 PM (1).jpeg" class="img-fluid rounded" alt="Post Image">
-          </div>
-          <div class="card-footer d-flex gap-3">
-            <button class="btn btn-outline-danger btn-sm">❤️ Like</button>
-            <button class="btn btn-outline-secondary btn-sm">💬 Comment</button>
-          </div>
-        </div>
-      </div>
 
-      <!-- For You Post: No image -->
-      <div id="foryou-section" style="display: none;">
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="Profile">
-              <strong>Jane Smith</strong>
+            <!-- For You Posts -->
+            <div id="foryou-section" style="display: none;">
+                {% for post in foryou_posts %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{% if post.profile.profile_picture %}{{ post.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
+                                     class="rounded-circle me-2" 
+                                     alt="{{ post.post.user.username }}'s profile"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                <strong>{{ post.post.user.username }}</strong>
+                            </div>
+                            {% if post.post.user != request.user %}
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                        {% if request.user in post.user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <p class="{% if not post.image %}fw-bold mb-0{% else %}mb-2 fw-normal{% endif %}">
+                                {{ post.post.content|truncatewords:50 }}
+                            </p>
+                            {% if post.post.type == 'image' %}
+                                <img src="{{post.post.media.url}}" 
+                                     class="img-fluid rounded mb-2" 
+                                     alt="{{ post.post..user.username }}'s post image">
+                            {% endif %}
+                            {% if post.post.type == 'video' %}
+                                <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
+                                    <video controls style="width: 100%; height: 100%; object-fit: cover;">
+                                        <source src="{{ post.post.media.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex gap-3">
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    ❤️ {{ post.likes.count }} Like{% if post.likes.count != 1 %}s{% endif %}
+                                </button>
+                            </form>
+                            <a href="" class="btn btn-outline-secondary btn-sm">💬 Comment</a>
+                            {% if post.user == request.user %}
+                                <a href="" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                <form method="POST" action="" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center">No posts available.</p>
+                {% endfor %}
             </div>
-            <button class="btn btn-outline-primary btn-sm">Follow</button>
-          </div>
-          <div class="card-body">
-            <!-- Only Text -->
-            <p class="fw-bold mb-0">This is a bold-only text post without image, styled like image space.</p>
-          </div>
-          <div class="card-footer d-flex gap-3">
-            <button class="btn btn-outline-danger btn-sm">❤️ Like</button>
-            <button class="btn btn-outline-secondary btn-sm">💬 Comment</button>
-          </div>
-        </div>
-      </div>
 
+        </div>
     </div>
-  </div>
-
 </div>
 
 <!-- Tab Toggle Script -->
 <script>
-  function showTab(tab) {
-    // Toggle tab active class
-    document.getElementById('following-tab').classList.remove('active');
-    document.getElementById('foryou-tab').classList.remove('active');
-    document.getElementById(tab + '-tab').classList.add('active');
+    function showTab(tab) {
+        // Toggle tab active class
+        document.getElementById('following-tab').classList.remove('active');
+        document.getElementById('foryou-tab').classList.remove('active');
+        document.getElementById(tab + '-tab').classList.add('active');
 
-    // Toggle content sections
-    document.getElementById('following-section').style.display = (tab === 'following') ? 'block' : 'none';
-    document.getElementById('foryou-section').style.display = (tab === 'foryou') ? 'block' : 'none';
-  }
+        // Toggle content sections
+        document.getElementById('following-section').style.display = (tab === 'following') ? 'block' : 'none';
+        document.getElementById('foryou-section').style.display = (tab === 'foryou') ? 'block' : 'none';
+    }
 </script>
-{% endblock %}
+{% endblock body %}

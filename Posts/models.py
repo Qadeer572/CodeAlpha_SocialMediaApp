@@ -7,13 +7,14 @@ class Post(models.Model):
     id= models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    type=models.CharField(max_length=20, choices=[('text', 'Text'), ('media', 'media')], default='text')
+    type=models.CharField(max_length=20, choices=[('text', 'Text'), ('image', 'image'),('video','video')], default='text')
     media = models.FileField(upload_to='post_media/', blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Post {self.id} by {self.user.username}"
+    
 class profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)

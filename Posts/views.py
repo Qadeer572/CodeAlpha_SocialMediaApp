@@ -5,4 +5,4 @@ from django.http import HttpResponse
 
 
 def home(request):
-    return HttpResponse(f"Welcome to the home page of the social {request.user.username} media app!")
+    return render(request, 'Posts/home.html')

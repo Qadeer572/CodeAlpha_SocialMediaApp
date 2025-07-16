@@ -18,9 +18,5 @@ class CustomeUserRegistrationForm(UserCreationForm):
         return user
 
 class UserLoginForm(AuthenticationForm):
-    username = forms.CharField(label='Username', max_length=254)
-    password = forms.CharField(label='Password', strip=False, widget=forms.PasswordInput)
-
-    class Meta:
-        model = User
-        fields = ('username', 'password')   
+    pass
+      

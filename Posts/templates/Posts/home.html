@@ -1,8 +1,86 @@
 {% extends 'core/base.html' %}
+
 {% block title %}
     Home
 {% endblock title %}
 
- {% block body %}
- 
- {% endblock body %} 
+{% block body %}
+<div class="container mt-4">
+
+  <!-- Tabs: Following | For You -->
+  <ul class="nav nav-tabs mb-4" id="feedTabs">
+    <li class="nav-item">
+      <a class="nav-link active" id="following-tab" href="#" onclick="showTab('following')">Following</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="foryou-tab" href="#" onclick="showTab('foryou')">For You</a>
+    </li>
+  </ul>
+
+  <!-- Posts Container -->
+  <div class="d-flex justify-content-center">
+    <div style="max-width: 600px; width: 100%">
+
+      <!-- Following Post: Has image -->
+      <div id="following-section">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="Profile">
+              <strong>John Doe</strong>
+            </div>
+            <button class="btn btn-outline-primary btn-sm">Follow</button>
+          </div>
+          <div class="card-body">
+            <!-- Description -->
+            <p class="mb-2 fw-normal">This is a following post with an image below.</p>
+            <!-- Image -->
+            <img src="/static/WhatsApp Image 2023-10-08 at 3.53.53 PM (1).jpeg" class="img-fluid rounded" alt="Post Image">
+          </div>
+          <div class="card-footer d-flex gap-3">
+            <button class="btn btn-outline-danger btn-sm">❤️ Like</button>
+            <button class="btn btn-outline-secondary btn-sm">💬 Comment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- For You Post: No image -->
+      <div id="foryou-section" style="display: none;">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="Profile">
+              <strong>Jane Smith</strong>
+            </div>
+            <button class="btn btn-outline-primary btn-sm">Follow</button>
+          </div>
+          <div class="card-body">
+            <!-- Only Text -->
+            <p class="fw-bold mb-0">This is a bold-only text post without image, styled like image space.</p>
+          </div>
+          <div class="card-footer d-flex gap-3">
+            <button class="btn btn-outline-danger btn-sm">❤️ Like</button>
+            <button class="btn btn-outline-secondary btn-sm">💬 Comment</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Tab Toggle Script -->
+<script>
+  function showTab(tab) {
+    // Toggle tab active class
+    document.getElementById('following-tab').classList.remove('active');
+    document.getElementById('foryou-tab').classList.remove('active');
+    document.getElementById(tab + '-tab').classList.add('active');
+
+    // Toggle content sections
+    document.getElementById('following-section').style.display = (tab === 'following') ? 'block' : 'none';
+    document.getElementById('foryou-section').style.display = (tab === 'foryou') ? 'block' : 'none';
+  }
+</script>
+{% endblock %}

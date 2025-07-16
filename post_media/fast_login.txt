@@ -1,0 +1,49 @@
+Dear Qadeer Raza
+
+Kindly see your class section, user account credentials, and other information below:
+
+ARN: 2323215
+Roll Number: 23I-3059
+Class Section: B
+
+Your first class: Func Eng Lab (Functional English Lab) in A-Call-1 Lab (SE-B1 in A Block, 2nd Floor)
+Time & Date of your first class: 08:30 am, 21st August, 2023
+
+Please be aware that minor changes in the timetable may occur. It is advised to consistently check the online timetable, especially at the beginning of the semester.
+
+Time Table Link: https://docs.google.com/spreadsheets/d/1knS7NRf3WjqFOnd-b5NTx1rvWNqvNK5jjecY0fkhcXM/edit?usp=sharing
+Courses allocation link: https://docs.google.com/spreadsheets/d/1fLL-7hDPGaeCbD1AvSrxzjL_kGcYkrc4yqLHP3NAY5Y/edit?usp=sharing
+
+For "Functional English - Lab" course:
+ - Students with odd roll numbers (last 4 digits) will attend the lab tagged as "Func Eng Lab (Program-Section1)" in the timetable, where Section is the class section of the student, e.g. Func Eng Lab (CS-F1), Func Eng Lab (SE-B1), Func Eng Lab (AI-A1), etc.
+ - Students with even roll numbers (last 4 digits) will attend the lab tagged as "Func Eng Lab (Program-Section2)" in the timetable, where Section is the class section of the student, e.g. Func Eng Lab (CY-B2), Func Eng Lab (DS-C2), etc. 
+
+Kindly ensure the confidentiality of your user account credentials and make it a practice to periodically update your passwords, particularly after your initial login.
+
+Flex
+   This platform serves as an academic portal designed for you to track both your attendance and performance.
+ Flex Website: flexstudent.nu.edu.pk
+ Flex Username: 23I-3059
+ Flex Password Current :razajaffery@isb72
+ Flex Password OLD: 6073971255
+
+Domain
+   The following credentials are necessary to access the computers within the laboratories at NUCES, Islamabad. You will need them in your first lab.
+ Domain Username: i233059
+ Domain Password Current : raza@isb3059
+ Domain Password OLD  :2323215 
+
+NUCES Email Address
+ NUCES Email Website: mail.nu.edu.pk
+ NUCES Email Username: i233059@isb.nu.edu.pk
+ NUCES Email Password: razajaffery@isb72
+
+Office 365
+ Office 365 Username: i233059@isb.nu.edu.pk
+ Office 365 Password: I$b2323215
+
+SLATE
+   This serves as an academic portal intended for official announcements and course coordination, with some instructors also utilizing Google Classroom.
+ NUCES Email Website: slate.nu.edu.pk
+ SLATE Username: i233059
+ SLATE Password: 34159

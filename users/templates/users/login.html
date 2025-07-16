@@ -1,28 +1,100 @@
-<!-- templates/login.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .form-container {
+      width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #444;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0069d9;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .error-msg {
+      color: red;
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Login</h2>
+  <div class="form-container">
+    <h2>Login</h2>
+    <form method="post" action="/users/login/">
+      {% csrf_token %}
 
-  {% if form.errors %}
-    <p style="color: red;">Invalid username or password.</p>
-  {% endif %}
+      {% if form.non_field_errors %}
+        <div class="error-msg">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
-    
-    <label>Username:</label><br>
-    <input type="text" name="username" required><br><br>
+      <label for="id_username">Username:</label>
+      {{ form.username }}
 
-    <label>Password:</label><br>
-    <input type="password" name="password" required><br><br>
+      {% if form.username.errors %}
+        <div class="error-msg">
+          {{ form.username.errors.0 }}
+        </div>
+      {% endif %}
 
-    <button type="submit">Login</button>
-  </form>
+      <label for="id_password">Password:</label>
+      {{ form.password }}
 
-  <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+      {% if form.password.errors %}
+        <div class="error-msg">
+          {{ form.password.errors.0 }}
+        </div>
+      {% endif %}
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="register-link">
+      Don't have an account? <a href="{% url 'register' %}">Register</a>
+    </div>
+  </div>
 </body>
 </html>

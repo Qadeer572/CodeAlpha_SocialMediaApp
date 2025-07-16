@@ -1,21 +1,5 @@
-# Django
-*.pyc
+ *.pyc
 __pycache__/
-*.sqlite3
 db.sqlite3
-
-# Media
 media/
-*.mp4
-*.jpg
-*.png
-
-# Environment
 .env
-
-# Node/Frontend
-node_modules/
-dist/
-
-# OS files
-.DS_Store

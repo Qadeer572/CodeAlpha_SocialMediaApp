@@ -1,0 +1,59 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    Upload Post
+{% endblock title %}
+
+{% block body %}
+<h1 class="text-center mt-4">Upload Post</h1>
+
+<div class="container mt-4">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Post Type -->
+        <div class="mb-3">
+            <label for="post_type" class="form-label">Post Type</label>
+            <select class="form-select" id="post_type" name="type" required onchange="toggleMediaInput()">
+                <option value="text" selected>Text</option>
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+            </select>
+        </div>
+
+        <!-- Content -->
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+
+        <!-- Media -->
+        <div class="mb-3" id="media_input" style="display: none;">
+            <label for="media" class="form-label">Upload Media</label>
+            <input type="file" class="form-control" id="media" name="media" accept=".jpg,.jpeg,.png,.mp4,.mov,.avi">
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary">Upload Post</button>
+    </form>
+</div>
+
+<!-- JavaScript to toggle media input -->
+<script>
+    function toggleMediaInput() {
+        const postType = document.getElementById("post_type").value;
+        const mediaInput = document.getElementById("media_input");
+        
+        if (postType === "text") {
+            mediaInput.style.display = "none";
+            document.getElementById("media").value = "";
+        } else {
+            mediaInput.style.display = "block";
+        }
+    }
+
+    // Call on page load to sync if needed
+    window.onload = toggleMediaInput;
+</script>
+{% endblock body %}

@@ -52,5 +52,23 @@ def Myprofile(request):
     else:
         return HttpResponse("You are not logged in. Please log in to access this page.")
 
+def ulploadPost(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            if request.method == 'POST':
+                content = request.POST.get('content')
+                post_type = request.POST.get('type')
+                media = request.FILES.get('media') if post_type in ['image', 'video'] else None
 
+                Post.objects.create(
+                    user=request.user,
+                    content=content,
+                    type=post_type,
+                    media=media
+                )
+                return redirect('/profile/')
+        return render(request, 'Posts/uploadPost.html')
+    else:
+        return HttpResponse("You are not logged in. Please log in to access this page.")
+    
  

@@ -5,9 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('',views.home, name='home'),  # Login view
-    path('profile/', views.Myprofile, name='profile'),  # Home view
-    path('uploadPost/', views.ulploadPost, name='uploadPost'),  # Edit profile view
+    path('editProfile/',views.editProfile, name='editProfile'),   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
  

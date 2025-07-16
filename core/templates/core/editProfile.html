@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    Edit Profile
+{% endblock title %}
+
+{% block body %}
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Edit Profile</h3>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Profile Picture & Upload -->
+            <div class="col-md-4 text-center">
+                <h4>Current Profile Picture</h4>
+                <img src="{% if data.profile.profile_picture %}{{ data.profile.profile_picture.url }}{% else %}{% static 'logo.jpg' %}{% endif %}"
+                    alt="Profile Picture"
+                    class="img-thumbnail rounded-circle mb-3"
+                    style="width: 200px; height: 200px; object-fit: cover;">
+
+                <!-- File Input for New Picture (inside form now) -->
+                <div class="mb-3">
+                    <label for="profile_picture" class="form-label">Change Profile Picture</label>
+                    <input type="file" name="profile_picture" id="profile_picture" class="form-control">
+                </div>
+            </div>
+
+            <!-- Profile Edit Fields -->
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" name="firstName" value="{{ data.firstName }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" name="lastName" value="{{ data.lastName }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea class="form-control" id="bio" name="bio" rows="4">{{ data.profile.bio }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock body %}

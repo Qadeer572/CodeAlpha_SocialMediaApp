@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+
 {% block title %}
     {{ user.username }}'s Profile
 {% endblock title %}
@@ -41,13 +42,18 @@
                     </button>
                 </form>
             {% else %}
-                <a href="#" class="btn btn-primary mb-3">Edit Profile</a>
+                <a href="/editProfile/" class="btn btn-primary mb-3">Edit Profile</a>
             {% endif %}
         </div>
-
+         
         <!-- User Posts -->
         <div class="col-md-8">
-            <h3 class="mb-4">Recent Posts</h3>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Recent Posts</h3>
+                {% if user == request.user %}
+                    <a href="/uploadPost/" class="btn btn-success">Upload Post</a>
+                {% endif %}
+            </div>
             {% for post in posts.all|slice:":10" %}
                 <div class="card mb-3">
                     <div class="card-body">

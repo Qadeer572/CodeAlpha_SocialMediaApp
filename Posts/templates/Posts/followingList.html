@@ -6,41 +6,213 @@
 {% endblock title %}
 
 {% block body %}
-<div class="container mt-5">
-    <h1>{{ user.username }}'s Following</h1>
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-4">
+                <h2 class="mb-0 me-3">Following</h2>
+                {% if profiles %}
+                    <span class="badge bg-secondary">{{ profiles|length }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     {% if profiles %}
-        <div class="d-flex justify-content-center">
-            <div style="max-width: 600px; width: 100%">
-                <ul class="list-group">
-                    {% for profile in profiles %}
-                        {% if profile.user and profile.user.id %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        {% for profile in profiles %}
+                            {% if profile.profile.user and profile.profile.user.id %}
+                                <div class="d-flex align-items-center p-3 {% if not forloop.last %}border-bottom{% endif %}">
                                     <!-- Profile Picture -->
-                                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}" 
-                                         alt="{{ profile.user.username }}'s profile picture" 
-                                         class="rounded-circle me-2" 
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-                                    <!-- Username -->
-                                    <span>{{ profile.user.username }}</span>
+                                    <img src="{% if profile.profile.profile_picture %}{{ profile.profile.profile_picture.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}"
+                                         alt="{{ profile.profile.user.username }}'s profile picture"
+                                         class="rounded-circle me-3"
+                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                    
+                                    <!-- User Info -->
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0 fw-semibold">{{ profile.profile.user.username }}</h6>
+                                        <small class="text-muted">{{ profile.TotalFollower }} followers</small>
+                                    </div>
+                                    
+                                    <!-- Follow/Unfollow Button -->
+                                    {% if profile.profile.user != user %}
+                                        <button class="follow-btn btn  btn-outline-secondary  btn-sm"
+                                                data-user-id="{{ profile.user.id }}">
+                                            <span id="follow-text-{{ profile.user.id }}">
+                                                Following 
+                                            </span>
+                                        </button>
+                                    {% endif %}
                                 </div>
-                                <!-- Follow/Unfollow Button -->
-                                {% if profile.user != user %}
-                                    <button class="follow-btn btn {% if profile.user in user.following.all %}btn-primary{% else %}btn-outline-primary{% endif %}" 
-                                            data-user-id="{{ profile.user.id }}">
-                                        <span id="follow-text-{{ profile.user.id }}">{% if profile.user in user.following.all %}Unfollow{% else %}Follow{% endif %}</span>
-                                    </button>
-                                {% else %}
-                                    <button class="btn btn-outline-primary disabled" disabled>You</button>
-                                {% endif %}
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     {% else %}
-        <p>No users followed.</p>
+        <!-- Empty State -->
+        <div class="row">
+            <div class="col-lg-6 col-md-8 col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted mb-3">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <h5 class="text-muted mb-2">No following yet</h5>
+                        <p class="text-muted mb-3">When you follow people, they'll appear here.</p>
+                        <a href="#" class="btn btn-primary btn-sm">Find people to follow</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 </div>
+
+<!-- Basic Styles -->
+<style>
+    .card {
+        border-radius: 8px;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 4px;
+        font-weight: 500;
+        min-width: 80px;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #dee2e6;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .fw-semibold {
+        font-weight: 600;
+    }
+    
+    .border-bottom {
+        border-bottom: 1px solid #e9ecef !important;
+    }
+    
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        .card-body .d-flex {
+            padding: 0.75rem !important;
+        }
+        
+        .btn-sm {
+            min-width: 70px;
+            padding: 0.2rem 0.5rem;
+        }
+    }
+</style>
+
+<!-- Simple JavaScript for Follow/Unfollow -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const followButtons = document.querySelectorAll('.follow-btn');
+    
+    followButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const followText = document.getElementById(`follow-text-${userId}`);
+            
+            // Disable button during request
+            this.disabled = true;
+            
+            // Your AJAX call here
+            // Example:
+            /*
+            fetch('/follow/' + userId + '/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update button state
+                    if (data.following) {
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline-secondary');
+                        followText.textContent = 'Following';
+                    } else {
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-primary');
+                        followText.textContent = 'Follow';
+                    }
+                }
+                this.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.disabled = false;
+            });
+            */
+            
+            // Temporary demo (remove this and use above AJAX)
+            setTimeout(() => {
+                if (this.classList.contains('btn-outline-secondary')) {
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-primary');
+                    followText.textContent = 'Follow';
+                } else {
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-outline-secondary');
+                    followText.textContent = 'Following';
+                }
+                this.disabled = false;
+            }, 500);
+        });
+    });
+});
+
+// Helper function for CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock body %}

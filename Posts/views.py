@@ -36,7 +36,6 @@ def home(request):
             })
         comments = Comment.objects.all()
         following_list = User.objects.filter(following__follower=request.user)
-        print(following_list)
         return render(request, 'Posts/home.html',{
             'foryou_posts': posts,
             'following_posts':following_post,
@@ -75,7 +74,14 @@ def followingList(request):
     if request.user.is_authenticated:
         following = Followers.objects.filter(follower=request.user)
         following_users = [f.user for f in following]
-        profiles = profile.objects.filter(user__in=following_users)
+        profiles1 = profile.objects.filter(user__in=following_users)
+        profiles=[]
+        for profile1 in profiles1:
+            if profile1.user != request.user:
+                profiles.append({
+                    "profile":profile1,
+                    "TotalFollower": Followers.objects.filter(user=profile1.user).count(),
+                    })
         return render(request, 'Posts/followingList.html', {'profiles': profiles})
     else:
         return HttpResponse("You are not logged in. Please log in to access this page.")

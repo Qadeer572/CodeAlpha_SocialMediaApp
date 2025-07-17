@@ -5,36 +5,229 @@
 {% endblock title %}
 
 {% block body %}
-<div class="container mt-5">
-    <!-- Tabs: Following | For You -->
-    <ul class="nav nav-tabs mb-4" id="feedTabs">
-        <li class="nav-item">
-            <a class="nav-link active" id="following-tab" href="#following-section" data-bs-toggle="tab">Following</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="foryou-tab" href="#foryou-section" data-bs-toggle="tab">For You</a>
-        </li>
-    </ul>
-
-    <!-- Posts Container -->
-    <div class="d-flex justify-content-center">
-        <div style="max-width: 600px; width: 100%">
-            <div class="tab-content">
-                <!-- Following Posts -->
-                <div class="tab-pane fade show active" id="following-section">
-                    {% include 'core/post_list.html' with posts=following_posts %}
+<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh; padding: 0;">
+    <!-- Header Section -->
+    <div class="sticky-top" style="background-color: white; border-bottom: 1px solid #e9ecef; z-index: 1000;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <!-- Centered Tabs -->
+                    <div class="d-flex justify-content-center py-3">
+                        <ul class="nav nav-tabs border-0" id="feedTabs" style="background: none;">
+                            <li class="nav-item">
+                                <a class="nav-link px-4 py-2 text-dark fw-medium" 
+                                   id="following-tab" 
+                                   href="#following-section" 
+                                   data-bs-toggle="tab"
+                                   style="border: none; background: none;">
+                                   Following
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active px-4 py-2 text-dark fw-medium" 
+                                   id="foryou-tab" 
+                                   href="#foryou-section" 
+                                   data-bs-toggle="tab"
+                                   style="border: none; background: none; border-bottom: 2px solid #007bff;">
+                                   For You
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- For You Posts -->
-                <div class="tab-pane fade" id="foryou-section">
-                    {% include 'core/post_list.html' with posts=foryou_posts %}
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="tab-content">
+                    <!-- Following Posts -->
+                    <div class="tab-pane fade" id="following-section">
+                        <div class="posts-container">
+                            {% include 'core/post_list.html' with posts=following_posts %}
+                        </div>
+                    </div>
+
+                    <!-- For You Posts -->
+                    <div class="tab-pane fade show active" id="foryou-section">
+                        <div class="posts-container">
+                            {% include 'core/post_list.html' with posts=foryou_posts %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- JavaScript -->
+<!-- Custom Styles -->
+<style>
+    /* Tab Styling */
+    .nav-tabs .nav-link {
+        color: #6c757d !important;
+        border: none !important;
+        background: none !important;
+        font-weight: 500;
+        font-size: 16px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #007bff !important;
+        background: none !important;
+        border: none !important;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #007bff !important;
+        background: none !important;
+        border: none !important;
+        border-bottom: 2px solid #007bff !important;
+    }
+
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 2px;
+        background-color: #007bff;
+    }
+
+    /* Button Styling */
+    .like-btn {
+        border: 1px solid #dc3545;
+        background: white;
+        color: #dc3545;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .like-btn:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .like-btn.btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .like-btn.btn-danger:hover {
+        background: #c82333;
+    }
+
+    .like-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .follow-btn {
+        border: 1px solid #007bff;
+        background: white;
+        color: #007bff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .follow-btn:hover {
+        background: #007bff;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .follow-btn.btn-primary {
+        background: #007bff;
+        color: white;
+    }
+
+    .follow-btn.btn-primary:hover {
+        background: #0056b3;
+    }
+
+    .follow-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Posts Container */
+    .posts-container {
+        max-width: 100%;
+    }
+
+    /* General Improvements */
+    .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .sticky-top {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .nav-tabs .nav-link {
+            font-size: 14px;
+            padding: 8px 16px !important;
+        }
+        
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+
+    /* Loading states */
+    .like-btn.loading, .follow-btn.loading {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .like-btn.loading::after, .follow-btn.loading::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: translateY(-50%) rotate(0deg); }
+        100% { transform: translateY(-50%) rotate(360deg); }
+    }
+</style>
+
+<!-- Enhanced JavaScript -->
 <script>
     // Cache CSRF token on page load
     const csrftoken = (function() {
@@ -61,147 +254,216 @@
     const activeFollowRequests = new Set();
     const activeLikeRequests = new Set();
 
+    // Add loading state to buttons
+    function addLoadingState(button) {
+        button.classList.add('loading');
+        button.disabled = true;
+    }
+
+    function removeLoadingState(button) {
+        button.classList.remove('loading');
+        button.disabled = false;
+    }
+
     // Click handler with event delegation
     document.addEventListener('click', function(event) {
         const likeButton = event.target.closest('.like-btn');
         const followButton = event.target.closest('.follow-btn');
 
         if (likeButton) {
-            const postId = likeButton.dataset.postId;
-            if (!postId) {
-                console.error('Like button missing data-post-id');
-                return;
-            }
-            if (activeLikeRequests.has(postId)) {
-                console.log(`Like request for postId ${postId} already in progress`);
-                return;
-            }
-            const likeCountSpan = likeButton.querySelector(`#like-count-${postId}`);
-            if (!likeCountSpan) {
-                console.error(`Like count span not found for postId: ${postId}`);
-                return;
-            }
-
-            likeButton.disabled = true; // Disable button during request
-            const debouncedLike = debounce(async (retryCount = 0) => {
-                try {
-                    activeLikeRequests.add(postId);
-                    console.log('Sending like request for postId:', postId);
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
-                    const response = await fetch('/likePost/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ id: postId }),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Like response:', data);
-                        if (typeof data.liked === 'boolean' && Number.isInteger(data.likes_count)) {
-                            likeCountSpan.textContent = data.likes_count;
-                            likeButton.classList.toggle('btn-danger', data.liked);
-                            likeButton.classList.toggle('btn-outline-danger', !data.liked);
-                            likeButton.querySelector('.like-text').textContent = `Like${data.likes_count !== 1 ? 's' : ''}`;
-                        } else {
-                            console.error('Invalid like response:', data);
-                        }
-                    } else {
-                        console.error('Failed to like the post:', response.status, await response.text());
-                    }
-                } catch (err) {
-                    console.error('Like error:', err);
-                    if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
-                        console.warn(`Retrying like request (${retryCount + 1}/2) for postId: ${postId}`);
-                        setTimeout(() => debouncedLike(retryCount + 1), 500);
-                    }
-                } finally {
-                    activeLikeRequests.delete(postId);
-                    likeButton.disabled = false;
-                }
-            }, 300);
-
-            debouncedLike();
+            handleLikeClick(likeButton);
         }
 
         if (followButton) {
-            const userId = followButton.dataset.userId;
-            console.log("This is userID:", userId);
-            if (!userId || userId === '') {
-                console.error('Follow button missing or invalid data-user-id');
-                return;
-            }
-            if (activeFollowRequests.has(userId)) {
-                console.log(`Follow request for userId ${userId} already in progress`);
-                return;
-            }
-            const followTextSpan = followButton.querySelector(`#follow-text-${userId}`);
-            if (!followTextSpan) {
-                console.error(`Follow text span not found for userId: ${userId}`);
-                return;
-            }
-
-            followButton.disabled = true; // Disable button during request
-            const debouncedFollow = debounce(async (retryCount = 0) => {
-                try {
-                    activeFollowRequests.add(userId);
-                    console.log('Sending follow request for userId:', userId);
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
-                    const response = await fetch('/follow/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ id: userId }),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Follow response:', data);
-                        if (typeof data.is_following === 'boolean') {
-                            const allFollowButtons = document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`);
-                            allFollowButtons.forEach(btn => {
-                                btn.classList.toggle('btn-primary', data.is_following);
-                                btn.classList.toggle('btn-outline-primary', !data.is_following);
-                                const textSpan = btn.querySelector(`#follow-text-${userId}`);
-                                if (textSpan) {
-                                    textSpan.textContent = data.is_following ? 'Unfollow' : 'Follow';
-                                }
-                                btn.disabled = false; // Re-enable all buttons
-                            });
-                        } else {
-                            console.error('Invalid response: is_following field missing or not a boolean', data);
-                        }
-                    } else {
-                        console.error('Failed to follow/unfollow the user:', response.status, await response.text());
-                    }
-                } catch (err) {
-                    console.error('Follow error:', err);
-                    if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
-                        console.warn(`Retrying follow request (${retryCount + 1}/2) for userId: ${userId}`);
-                        setTimeout(() => debouncedFollow(retryCount + 1), 500);
-                    }
-                } finally {
-                    activeFollowRequests.delete(userId);
-                    document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`).forEach(btn => {
-                        btn.disabled = false;
-                    });
-                }
-            }, 300);
-
-            debouncedFollow();
+            handleFollowClick(followButton);
         }
+    });
+
+    // Handle like button clicks
+    function handleLikeClick(likeButton) {
+        const postId = likeButton.dataset.postId;
+        if (!postId) {
+            console.error('Like button missing data-post-id');
+            return;
+        }
+        
+        if (activeLikeRequests.has(postId)) {
+            console.log(`Like request for postId ${postId} already in progress`);
+            return;
+        }
+
+        const likeCountSpan = likeButton.querySelector(`#like-count-${postId}`);
+        if (!likeCountSpan) {
+            console.error(`Like count span not found for postId: ${postId}`);
+            return;
+        }
+
+        addLoadingState(likeButton);
+        
+        async function likeRequest(retryCount = 0) {
+    try {
+        activeLikeRequests.add(postId);
+        console.log('Sending like request for postId:', postId);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch('/likePost/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            credentials: 'include',
+            body: JSON.stringify({ id: postId }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Like response:', data);
+
+            if (typeof data.liked === 'boolean' && Number.isInteger(data.likes_count)) {
+                likeCountSpan.textContent = data.likes_count;
+
+                if (data.liked) {
+                    likeButton.classList.remove('btn-outline-danger');
+                    likeButton.classList.add('btn-danger');
+                } else {
+                    likeButton.classList.remove('btn-danger');
+                    likeButton.classList.add('btn-outline-danger');
+                }
+
+                const likeText = likeButton.querySelector('.like-text');
+                if (likeText) {
+                    likeText.textContent = `Like${data.likes_count !== 1 ? 's' : ''}`;
+                }
+            } else {
+                console.error('Invalid like response:', data);
+            }
+        } else {
+            console.error('Failed to like the post:', response.status, await response.text());
+        }
+    } catch (err) {
+        console.error('Like error:', err);
+        if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
+            console.warn(`Retrying like request (${retryCount + 1}/2) for postId: ${postId}`);
+            setTimeout(() => likeRequest(retryCount + 1), 500);
+            return;
+        }
+    } finally {
+        activeLikeRequests.delete(postId);
+        removeLoadingState(likeButton);
+    }
+}
+likeRequest();
+    }
+
+    // Handle follow button clicks
+function handleFollowClick(followButton) {
+    const userId = followButton.dataset.userId;
+    console.log("This is userID:", userId);
+
+    if (!userId || userId === '') {
+        console.error('Follow button missing or invalid data-user-id');
+        return;
+    }
+
+    if (activeFollowRequests.has(userId)) {
+        console.log(`Follow request for userId ${userId} already in progress`);
+        return;
+    }
+
+    const followTextSpan = followButton.querySelector(`#follow-text-${userId}`);
+    if (!followTextSpan) {
+        console.error(`Follow text span not found for userId: ${userId}`);
+        return;
+    }
+
+    // Add loading state to all follow buttons for this user
+    const allFollowButtons = document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`);
+    allFollowButtons.forEach(btn => addLoadingState(btn));
+
+    async function followRequest(retryCount = 0) {
+        try {
+            activeFollowRequests.add(userId);
+            console.log('Sending follow request for userId:', userId);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            const response = await fetch('/follow/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                credentials: 'include',
+                body: JSON.stringify({ id: userId }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Follow response:', data);
+
+                if (typeof data.is_following === 'boolean') {
+                    // Update all follow buttons for this user
+                    allFollowButtons.forEach(btn => {
+                        if (data.is_following) {
+                            btn.classList.remove('btn-primary');
+                            btn.classList.add('btn-outline-primary');
+                        } else {
+                            btn.classList.remove('btn-outline-primary');
+                            btn.classList.add('btn-primary');
+                        }
+
+                        const textSpan = btn.querySelector(`#follow-text-${userId}`);
+                        if (textSpan) {
+                            textSpan.textContent = data.is_following ? 'Following' : 'Follow';
+                        }
+                    });
+                } else {
+                    console.error('Invalid response: is_following field missing or not a boolean', data);
+                }
+            } else {
+                console.error('Failed to follow/unfollow the user:', response.status, await response.text());
+            }
+        } catch (err) {
+            console.error('Follow error:', err);
+            if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
+                console.warn(`Retrying follow request (${retryCount + 1}/2) for userId: ${userId}`);
+                setTimeout(() => followRequest(retryCount + 1), 500);
+                return;
+            }
+        } finally {
+            activeFollowRequests.delete(userId);
+            allFollowButtons.forEach(btn => removeLoadingState(btn));
+        }
+    }
+
+    followRequest();
+}
+
+    // Handle tab switching
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabLinks = document.querySelectorAll('.nav-link');
+        
+        tabLinks.forEach(link => {
+            link.addEventListener('shown.bs.tab', function(e) {
+                // Remove active border from all tabs
+                tabLinks.forEach(tab => {
+                    tab.style.borderBottom = 'none';
+                });
+                
+                // Add active border to current tab
+                e.target.style.borderBottom = '2px solid #007bff';
+            });
+        });
     });
 </script>
 {% endblock body %}

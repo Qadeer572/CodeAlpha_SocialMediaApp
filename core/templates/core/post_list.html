@@ -10,8 +10,8 @@
                 <strong>{{ post.post.user.username }}</strong>
             </div>
             {% if post.post.user != request.user %}
-            <button class="follow-btn btn {% if post.post.user in following_list %}btn-primary{% else %}btn-outline-primary{% endif %}" data-user-id="{{ post.post.user.id }}">
-                <span id="follow-text-{{ post.post.user.id }}">{% if post.post.user in following_list %}Unfollow{% else %}Follow{% endif %}</span>
+            <button class="follow-btn btn {% if post.post.user in following_list %}btn-outline-primary{% else %}btn-primary{% endif %}" data-user-id="{{ post.post.user.id }}">
+                <span id="follow-text-{{ post.post.user.id }}">{% if post.post.user in following_list %}Following{% else %}Follow{% endif %}</span>
             </button>
             {% endif %}
         </div>
@@ -37,7 +37,7 @@
         <div class="card-footer d-flex gap-3">
             <button 
                 type="button" 
-                class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %} like-btn" 
+                class="btn btn-sm {% if post.liked %}btn-danger{% else %}btn-outline-danger{% endif %} like-btn" 
                 data-post-id="{{ post.post.id }}">
                 ❤️ <span id="like-count-{{ post.post.id }}">{{ post.post.likes.count }}</span> <span class="like-text">Like{% if post.post.likes.count != 1 %}s{% endif %}</span>
             </button>

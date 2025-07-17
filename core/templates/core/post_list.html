@@ -1,0 +1,59 @@
+{% for post in posts %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="{% if post.profile.profile_picture %}{{ post.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
+                     class="rounded-circle me-2" 
+                     alt="{{ post.post.user.username }}'s profile"
+                     style="width: 40px; height: 40px; object-fit: cover;"
+                     loading="lazy">
+                <strong>{{ post.post.user.username }}</strong>
+            </div>
+            {% if post.post.user != request.user %}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        {% if post.post.user in following_list %}Unfollow{% else %}Follow{% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p class="mb-2 fw-normal">{{ post.post.content|truncatewords:50 }}</p>
+            {% if post.post.type == 'image' %}
+                <img src="{{ post.post.media.url }}" 
+                     class="img-fluid rounded mb-2" 
+                     alt="{{ post.post.user.username }}'s post image"
+                     loading="lazy">
+            {% endif %}
+            {% if post.post.type == 'video' %}
+                <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
+                    <video controls 
+                           style="width: 100%; height: 100%; object-fit: cover;" 
+                           loading="lazy">
+                        <source src="{{ post.post.media.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer d-flex gap-3">
+            <button 
+                type="button" 
+                class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %} like-btn" 
+                data-post-id="{{ post.post.id }}">
+                ❤️ <span id="like-count-{{ post.post.id }}">{{ post.post.likes.count }}</span> <span class="like-text">Like{% if post.post.likes.count != 1 %}s{% endif %}</span>
+            </button>
+            <a href="" class="btn btn-outline-secondary btn-sm">💬 Comment</a>
+            {% if post.post.user == request.user %}
+                <a href="" class="btn btn-outline-secondary btn-sm">Edit</a>
+                <form method="POST" action="" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p class="text-center">No posts available.</p>
+{% endfor %}

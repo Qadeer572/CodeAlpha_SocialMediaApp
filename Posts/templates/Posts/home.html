@@ -9,152 +9,89 @@
     <!-- Tabs: Following | For You -->
     <ul class="nav nav-tabs mb-4" id="feedTabs">
         <li class="nav-item">
-            <a class="nav-link active" id="following-tab" href="#" onclick="showTab('following')">Following</a>
+            <a class="nav-link active" id="following-tab" href="#following-section" data-bs-toggle="tab">Following</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="foryou-tab" href="#" onclick="showTab('foryou')">For You</a>
+            <a class="nav-link" id="foryou-tab" href="#foryou-section" data-bs-toggle="tab">For You</a>
         </li>
     </ul>
 
     <!-- Posts Container -->
     <div class="d-flex justify-content-center">
         <div style="max-width: 600px; width: 100%">
+            <div class="tab-content">
+                <!-- Following Posts -->
+                <div class="tab-pane fade show active" id="following-section">
+                    {% include 'core/post_list.html' with posts=following_posts %}
+                </div>
 
-            <!-- Following Posts -->
-            <div id="following-section">
-                {% for post in following_posts %}
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <img src="{% if post.profile.profile_picture %}{{ post.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
-                                     class="rounded-circle me-2" 
-                                     alt="{{ post.post.user.username }}'s profile"
-                                     style="width: 40px; height: 40px; object-fit: cover;">
-                                <strong>{{ post.post.user.username }}</strong>
-                            </div>
-                            {% if post.post.user != request.user %}
-                                <form method="POST" action="">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        {% if request.user in post.user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
-                                    </button>
-                                </form>
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-2 fw-normal">{{ post.post.content|truncatewords:50 }}</p>
-                            {% if post.post.type == 'image' %}
-                                <img src="{{post.post.media.url}}" 
-                                     class="img-fluid rounded mb-2" 
-                                     alt="{{ post.post..user.username }}'s post image">
-                            {% endif %}
-                            {% if post.post.type == 'video' %}
-                                <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
-                                    <video controls style="width: 100%; height: 100%; object-fit: cover;">
-                                        <source src="{{ post.post.media.url }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer d-flex gap-3">
-                            <form method="POST" action="">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    ❤️ {{ post.likes.count }} Like{% if post.likes.count != 1 %}s{% endif %}
-                                </button>
-                            </form>
-                            <a href="" class="btn btn-outline-secondary btn-sm">💬 Comment</a>
-                            {% if post.user == request.user %}
-                                <a href="" class="btn btn-outline-secondary btn-sm">Edit</a>
-                                <form method="POST" action="" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% empty %}
-                    <p class="text-center">No posts from people you follow.</p>
-                {% endfor %}
+                <!-- For You Posts -->
+                <div class="tab-pane fade" id="foryou-section">
+                    {% include 'core/post_list.html' with posts=foryou_posts %}
+                </div>
             </div>
-
-            <!-- For You Posts -->
-            <div id="foryou-section" style="display: none;">
-                {% for post in foryou_posts %}
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <img src="{% if post.profile.profile_picture %}{{ post.profile.profile_picture.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
-                                     class="rounded-circle me-2" 
-                                     alt="{{ post.post.user.username }}'s profile"
-                                     style="width: 40px; height: 40px; object-fit: cover;">
-                                <strong>{{ post.post.user.username }}</strong>
-                            </div>
-                            {% if post.post.user != request.user %}
-                                <form method="POST" action="">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        {% if request.user in post.user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
-                                    </button>
-                                </form>
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <p class="{% if not post.image %}fw-bold mb-0{% else %}mb-2 fw-normal{% endif %}">
-                                {{ post.post.content|truncatewords:50 }}
-                            </p>
-                            {% if post.post.type == 'image' %}
-                                <img src="{{post.post.media.url}}" 
-                                     class="img-fluid rounded mb-2" 
-                                     alt="{{ post.post..user.username }}'s post image">
-                            {% endif %}
-                            {% if post.post.type == 'video' %}
-                                <div class="ratio ratio-16x9 mb-2 rounded overflow-hidden">
-                                    <video controls style="width: 100%; height: 100%; object-fit: cover;">
-                                        <source src="{{ post.post.media.url }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer d-flex gap-3">
-                            <form method="POST" action="">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    ❤️ {{ post.likes.count }} Like{% if post.likes.count != 1 %}s{% endif %}
-                                </button>
-                            </form>
-                            <a href="" class="btn btn-outline-secondary btn-sm">💬 Comment</a>
-                            {% if post.user == request.user %}
-                                <a href="" class="btn btn-outline-secondary btn-sm">Edit</a>
-                                <form method="POST" action="" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% empty %}
-                    <p class="text-center">No posts available.</p>
-                {% endfor %}
-            </div>
-
         </div>
     </div>
 </div>
 
-<!-- Tab Toggle Script -->
+<!-- JavaScript -->
 <script>
-    function showTab(tab) {
-        // Toggle tab active class
-        document.getElementById('following-tab').classList.remove('active');
-        document.getElementById('foryou-tab').classList.remove('active');
-        document.getElementById(tab + '-tab').classList.add('active');
+    // Cache CSRF token on page load
+    const csrftoken = (function() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith('csrftoken=')) {
+                return decodeURIComponent(cookie.substring('csrftoken='.length));
+            }
+        }
+        return '';
+    })();
 
-        // Toggle content sections
-        document.getElementById('following-section').style.display = (tab === 'following') ? 'block' : 'none';
-        document.getElementById('foryou-section').style.display = (tab === 'foryou') ? 'block' : 'none';
+    // Debounce function to limit rapid clicks
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
     }
+
+    // Like handler with event delegation
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('.like-btn');
+        if (!button) return;
+
+        const postId = button.dataset.postId;
+        const likeCountSpan = button.querySelector(`#like-count-${postId}`);
+
+        const debouncedLike = debounce(async () => {
+            try {
+                const response = await fetch('/likePost/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ id: postId }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    likeCountSpan.textContent = data.likes_count;
+                    button.classList.toggle('btn-danger', data.liked);
+                    button.classList.toggle('btn-outline-danger', !data.liked);
+                    button.querySelector('.like-text').textContent = `Like${data.likes_count !== 1 ? 's' : ''}`;
+                } else {
+                    console.error('Failed to like the post');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }, 300);
+
+        debouncedLike();
+    });
 </script>
 {% endblock body %}

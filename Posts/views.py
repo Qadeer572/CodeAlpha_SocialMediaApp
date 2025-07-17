@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import redirect
 from .models import Post, Comment, Followers, profile
+from django.contrib.auth.models import User
+from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -15,29 +18,37 @@ def home(request):
         following = Post.objects.filter(user__in=Followers.objects.filter(follower=request.user).values_list('user', flat=True)).order_by('-created_at')
         for post in following:
             profile_v = profile.objects.filter(user=post.user).first()
+            liked = post.likes.filter(id=request.user.id).exists()
             following_post.append({
                 'post': post,
                 'profile': profile_v,
+                'liked': liked,
             })
         post_list= Post.objects.exclude(user=request.user).order_by('-created_at')
         for post1 in post_list:
             profile_v = profile.objects.filter(user=post1.user).first()
+            liked = post1.likes.filter(id=request.user.id).exists()
+            
             posts.append({
                 'post': post1,
                 'profile': profile_v,
+                'liked': liked,
             })
         comments = Comment.objects.all()
+        following_list = User.objects.filter(following__follower=request.user)
+        print(following_list)
         return render(request, 'Posts/home.html',{
             'foryou_posts': posts,
             'following_posts':following_post,
             'comments': comments,
+            'following_list': following_list,
         })
     else:
         return render(request, 'Posts/home.html')
 
 def Myprofile(request):
     profile_v= profile.objects.filter(user=request.user).first()  
-    posts = Post.objects.filter(user=request.user)
+    posts = Post.objects.filter(user=request.user).order_by('-created_at')
     followers = Followers.objects.filter(user=request.user)
     following = Followers.objects.filter(follower=request.user)
     No_Follower=followers.count()
@@ -71,4 +82,30 @@ def ulploadPost(request):
     else:
         return HttpResponse("You are not logged in. Please log in to access this page.")
     
- 
+
+
+class likePost(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def post(self, request):
+        try:
+            post_id = request.data.get('id')
+            post = Post.objects.get(id=post_id)
+
+            if request.user in post.likes.all():
+                post.likes.remove(request.user)
+                liked = False
+            else:
+                post.likes.add(request.user)
+                liked = True
+
+            likes_count = post.likes.count()
+            
+            return Response({  # Use capital R here
+                "status": True,
+                "liked": liked,
+                "likes_count": likes_count,
+            })
+
+        except Post.DoesNotExist:
+            return HttpResponse(status=404)

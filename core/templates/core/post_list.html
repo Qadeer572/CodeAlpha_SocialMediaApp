@@ -10,12 +10,9 @@
                 <strong>{{ post.post.user.username }}</strong>
             </div>
             {% if post.post.user != request.user %}
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                        {% if post.post.user in following_list %}Unfollow{% else %}Follow{% endif %}
-                    </button>
-                </form>
+            <button class="follow-btn btn {% if post.post.user in following_list %}btn-primary{% else %}btn-outline-primary{% endif %}" data-user-id="{{ post.post.user.id }}">
+                <span id="follow-text-{{ post.post.user.id }}">{% if post.post.user in following_list %}Unfollow{% else %}Follow{% endif %}</span>
+            </button>
             {% endif %}
         </div>
         <div class="card-body">

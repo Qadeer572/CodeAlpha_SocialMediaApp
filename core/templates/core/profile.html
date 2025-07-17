@@ -20,12 +20,16 @@
             <!-- Follower/Following Counts -->
             <div class="d-flex justify-content-center gap-4 mb-3">
                 <div>
-                    <strong>{{ followers}}</strong>
-                    <span class="text-muted">Followers</span>
+                    <a href="/followersList/" class="text-decoration-none">
+                        <strong>{{ followers}}</strong>
+                        <span class="text-muted">Followers</span>
+                   </a>
                 </div>
                 <div>
-                    <strong>{{ following }}</strong>
-                    <span class="text-muted">Following</span>
+                    <a href="/followingList/" class="text-decoration-none">
+                        <strong>{{ following }}</strong>
+                        <span class="text-muted">Following</span>
+                    </a>
                 </div>
                 <div>
                     <strong>{{ posts.count }}</strong>

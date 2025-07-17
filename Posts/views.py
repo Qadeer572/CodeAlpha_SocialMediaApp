@@ -62,8 +62,24 @@ def Myprofile(request):
         })
     else:
         return HttpResponse("You are not logged in. Please log in to access this page.")
-
-def ulploadPost(request):
+def followersList(request):
+    if request.user.is_authenticated:
+        followers = Followers.objects.filter(user=request.user)
+        follower_users = [f.follower for f in followers]
+        profiles = profile.objects.filter(user__in=follower_users)
+        following= Followers.objects.filter(follower=request.user)
+        return render(request, 'Posts/followerList.html', {'profiles': profiles, 'following': following})
+    else:
+        return HttpResponse("You are not logged in. Please log in to access this page.")
+def followingList(request):
+    if request.user.is_authenticated:
+        following = Followers.objects.filter(follower=request.user)
+        following_users = [f.user for f in following]
+        profiles = profile.objects.filter(user__in=following_users)
+        return render(request, 'Posts/followingList.html', {'profiles': profiles})
+    else:
+        return HttpResponse("You are not logged in. Please log in to access this page.")
+def uploadPost(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             if request.method == 'POST':
@@ -109,3 +125,36 @@ class likePost(APIView):
 
         except Post.DoesNotExist:
             return HttpResponse(status=404)
+
+
+class followUser(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user_id = request.data.get('id')
+            user_to_follow = User.objects.get(id=user_id)
+
+            if user_to_follow == request.user:
+                return Response({"status": False, "message": "You cannot follow yourself."})
+
+            follow_instance, created = Followers.objects.get_or_create(user=user_to_follow, follower=request.user)
+            is_following=False
+            if created:
+                is_following = True
+                return Response({
+                    "status": True,
+                    "is_following": is_following,
+                    "message": "You are now following this user."
+                    })
+            else:
+                follow_instance.delete()
+                return Response({
+                        "status": True,
+                        "is_following": is_following,
+                        "message": "You have unfollowed this user."
+                        })
+
+        except User.DoesNotExist:
+            return HttpResponse(status=404)        
+        

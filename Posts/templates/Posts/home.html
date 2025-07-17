@@ -57,41 +57,151 @@
         };
     }
 
-    // Like handler with event delegation
+    // Track active requests to prevent duplicates
+    const activeFollowRequests = new Set();
+    const activeLikeRequests = new Set();
+
+    // Click handler with event delegation
     document.addEventListener('click', function(event) {
-        const button = event.target.closest('.like-btn');
-        if (!button) return;
+        const likeButton = event.target.closest('.like-btn');
+        const followButton = event.target.closest('.follow-btn');
 
-        const postId = button.dataset.postId;
-        const likeCountSpan = button.querySelector(`#like-count-${postId}`);
-
-        const debouncedLike = debounce(async () => {
-            try {
-                const response = await fetch('/likePost/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ id: postId }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    likeCountSpan.textContent = data.likes_count;
-                    button.classList.toggle('btn-danger', data.liked);
-                    button.classList.toggle('btn-outline-danger', !data.liked);
-                    button.querySelector('.like-text').textContent = `Like${data.likes_count !== 1 ? 's' : ''}`;
-                } else {
-                    console.error('Failed to like the post');
-                }
-            } catch (err) {
-                console.error('Error:', err);
+        if (likeButton) {
+            const postId = likeButton.dataset.postId;
+            if (!postId) {
+                console.error('Like button missing data-post-id');
+                return;
             }
-        }, 300);
+            if (activeLikeRequests.has(postId)) {
+                console.log(`Like request for postId ${postId} already in progress`);
+                return;
+            }
+            const likeCountSpan = likeButton.querySelector(`#like-count-${postId}`);
+            if (!likeCountSpan) {
+                console.error(`Like count span not found for postId: ${postId}`);
+                return;
+            }
 
-        debouncedLike();
+            likeButton.disabled = true; // Disable button during request
+            const debouncedLike = debounce(async (retryCount = 0) => {
+                try {
+                    activeLikeRequests.add(postId);
+                    console.log('Sending like request for postId:', postId);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                    const response = await fetch('/likePost/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ id: postId }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Like response:', data);
+                        if (typeof data.liked === 'boolean' && Number.isInteger(data.likes_count)) {
+                            likeCountSpan.textContent = data.likes_count;
+                            likeButton.classList.toggle('btn-danger', data.liked);
+                            likeButton.classList.toggle('btn-outline-danger', !data.liked);
+                            likeButton.querySelector('.like-text').textContent = `Like${data.likes_count !== 1 ? 's' : ''}`;
+                        } else {
+                            console.error('Invalid like response:', data);
+                        }
+                    } else {
+                        console.error('Failed to like the post:', response.status, await response.text());
+                    }
+                } catch (err) {
+                    console.error('Like error:', err);
+                    if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
+                        console.warn(`Retrying like request (${retryCount + 1}/2) for postId: ${postId}`);
+                        setTimeout(() => debouncedLike(retryCount + 1), 500);
+                    }
+                } finally {
+                    activeLikeRequests.delete(postId);
+                    likeButton.disabled = false;
+                }
+            }, 300);
+
+            debouncedLike();
+        }
+
+        if (followButton) {
+            const userId = followButton.dataset.userId;
+            console.log("This is userID:", userId);
+            if (!userId || userId === '') {
+                console.error('Follow button missing or invalid data-user-id');
+                return;
+            }
+            if (activeFollowRequests.has(userId)) {
+                console.log(`Follow request for userId ${userId} already in progress`);
+                return;
+            }
+            const followTextSpan = followButton.querySelector(`#follow-text-${userId}`);
+            if (!followTextSpan) {
+                console.error(`Follow text span not found for userId: ${userId}`);
+                return;
+            }
+
+            followButton.disabled = true; // Disable button during request
+            const debouncedFollow = debounce(async (retryCount = 0) => {
+                try {
+                    activeFollowRequests.add(userId);
+                    console.log('Sending follow request for userId:', userId);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                    const response = await fetch('/follow/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ id: userId }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Follow response:', data);
+                        if (typeof data.is_following === 'boolean') {
+                            const allFollowButtons = document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`);
+                            allFollowButtons.forEach(btn => {
+                                btn.classList.toggle('btn-primary', data.is_following);
+                                btn.classList.toggle('btn-outline-primary', !data.is_following);
+                                const textSpan = btn.querySelector(`#follow-text-${userId}`);
+                                if (textSpan) {
+                                    textSpan.textContent = data.is_following ? 'Unfollow' : 'Follow';
+                                }
+                                btn.disabled = false; // Re-enable all buttons
+                            });
+                        } else {
+                            console.error('Invalid response: is_following field missing or not a boolean', data);
+                        }
+                    } else {
+                        console.error('Failed to follow/unfollow the user:', response.status, await response.text());
+                    }
+                } catch (err) {
+                    console.error('Follow error:', err);
+                    if ((err.name === 'AbortError' || err.message.includes('Failed to fetch')) && retryCount < 2) {
+                        console.warn(`Retrying follow request (${retryCount + 1}/2) for userId: ${userId}`);
+                        setTimeout(() => debouncedFollow(retryCount + 1), 500);
+                    }
+                } finally {
+                    activeFollowRequests.delete(userId);
+                    document.querySelectorAll(`.follow-btn[data-user-id="${userId}"]`).forEach(btn => {
+                        btn.disabled = false;
+                    });
+                }
+            }, 300);
+
+            debouncedFollow();
+        }
     });
 </script>
 {% endblock body %}

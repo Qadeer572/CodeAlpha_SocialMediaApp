@@ -75,20 +75,21 @@
                                     </div>
                                     <p class="mb-1 mt-1">{{ comment.content }}</p>
                                     {% if comment.user == request.user %}
-                                        <div class="mt-2 flex flex-row">
-                                            <button class="btn btn-sm btn-outline-secondary edit-comment-btn" 
-                                                    data-comment-id="{{ comment.id }}"
-                                                    data-comment-content="{{ comment.content }}">
-                                                Edit
+                                    <div class="mt-2" style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
+                                        <button class="btn btn-sm btn-outline-secondary edit-comment-btn" 
+                                                data-comment-id="{{ comment.id }}"
+                                                data-comment-content="{{ comment.content }}">
+                                            Edit
+                                        </button>
+                                    
+                                        <form class="delete-comment-form" data-comment-id="{{ comment.id }}">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn">
+                                                Delete
                                             </button>
-                                            <form class="delete-comment-form" data-comment-id="{{ comment.id }}">
-                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                                                <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                            
-                                        </div>
+                                        </form>
+                                    </div>
+                                    
                                     {% endif %}
                                 </div>
                             </div>
@@ -203,24 +204,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     const avatarUrl = data.comment.profile_pic || 'https://via.placeholder.com/32';
                     
                     
-                    
+                    commentInput.value='';
                     const editDeleteButtons= `
-                        <div class="mt-2">
+                        <div class="mt-2" style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
                             <button class="btn btn-sm btn-outline-secondary edit-comment-btn" 
-                                    data-comment-id="${data.comment.id}"
-                                    data-comment-content="${data.comment.content.replace(/"/g, '&quot;')}">
+                                    data-comment-id="${ data.comment.id }"
+                                    data-comment-content="${ data.comment.content }">
                                 Edit
                             </button>
-                            <form method="POST" action="#" style="display: inline;">
-                                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                        onclick="return confirm('Are you sure you want to delete this comment?')">
+
+                            <form class="delete-comment-form" data-comment-id="${ data.comment.id }">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn">
                                     Delete
                                 </button>
                             </form>
                         </div>
+
                     `;
-                    console.log(editDeleteButtons)
+                     
                     newComment.innerHTML = `
                         <div class="d-flex align-items-start">
                             <img src="${avatarUrl}" 
@@ -272,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
                         console.log('Success:', data.message);
                         console.log("form",form);
+                        form.clear();
                         form.parentNode.insertBefore(successMsg, form);
                         
                         // Auto-hide success message
@@ -289,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error adding comment. Please check your connection and try again.');
+                 
             })
             .finally(() => {
                 // Reset button state
@@ -380,7 +383,7 @@ if (!window.deleteListenerAdded) {
                         noComments.textContent = 'No comments yet. Be the first to comment!';
                         commentsList.appendChild(noComments);
                     }
-                    
+                    console.log('Comment deleted successfully, current count:', currentCount);
                     console.log('Comment deleted successfully, new count:', commentCountElement ? commentCountElement.textContent : 'N/A');
                 } else {
                     console.error('Delete failed:', data);
@@ -448,7 +451,7 @@ if (!window.deleteListenerAdded) {
                     if (data.status) {
                         contentParagraph.innerHTML = newContent;
                         e.target.dataset.commentContent = newContent;
-                        buttonContainer.style.display = 'block';
+                        buttonContainer.style.display = 'flex';
                     } else {
                         alert('Error updating comment: ' + (data.error || 'Unknown error'));
                         saveBtn.disabled = false;
@@ -468,7 +471,8 @@ if (!window.deleteListenerAdded) {
                 contentParagraph.innerHTML = currentContent;
 
                 // Show edit/delete buttons again
-                buttonContainer.style.display = 'block';
+                buttonContainer.style.display = 'flex';
+
             });
 
         }

@@ -298,3 +298,27 @@ def deletePost(request, postId):
             return redirect('/profile/')
         except Post.DoesNotExist:
             return HttpResponse("Post not found.", status=404)
+
+def editPost(request,postID):
+    if request.user.is_authenticated:
+        try:
+            post = Post.objects.get(id=postID, user=request.user)
+            if request.method == 'POST':
+                content = request.POST.get('content')
+                post_type = request.POST.get('type')
+                media = request.FILES.get('media') if post_type in ['image', 'video'] else None
+
+                if post_type != 'text':
+                    if media is None:
+                        media=post.media
+                        
+                post.content = content
+                post.type = post_type
+                post.media = media
+                post.save()
+                return redirect('/profile/')
+            return render(request, 'Posts/editPost.html', {'post': post})
+        except Post.DoesNotExist:
+            return HttpResponse("Post not found.", status=404)
+    else:
+        return HttpResponse("You are not logged in. Please log in to access this page.")

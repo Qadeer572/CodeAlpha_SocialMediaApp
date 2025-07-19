@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    Edit Post : {{ post.id }}
+{% endblock title %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Edit Post</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Post Type Selection -->
+        <div class="form-group mb-3">
+            <label for="type">Type</label>
+            <select name="type" id="type" class="form-control" onchange="toggleMediaInput()">
+                <option value="text" {% if post.type == 'text' %}selected{% endif %}>Text</option>
+                <option value="image" {% if post.type == 'image' %}selected{% endif %}>Image</option>
+                <option value="video" {% if post.type == 'video' %}selected{% endif %}>Video</option>
+            </select>
+        </div>
+
+        <!-- Content -->
+        <div class="form-group mb-3">
+            <label for="content">Content</label>
+            <textarea name="content" id="content" rows="4" class="form-control">{{ post.content }}</textarea>
+        </div>
+
+        <!-- Existing Media Preview -->
+        {% if post.type == 'image' and post.media %}
+            <div class="mb-3">
+                <label>Current Image:</label>
+                <img src="{{ post.media.url }}" alt="Post Image" class="img-fluid">
+            </div>
+        {% elif post.type == 'video' and post.media %}
+            <div class="mb-3">
+                <label>Current Video:</label>
+                <video controls class="w-100">
+                    <source src="{{ post.media.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        {% endif %}
+
+        <!-- Upload New Media -->
+        <div class="form-group mb-3" id="mediaInput" style="{% if post.type == 'text' %}display: none;{% endif %}">
+            <label for="media">Upload Media</label>
+            <input type="file" name="media" id="media" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Post</button>
+    </form>
+</div>
+
+<!-- JavaScript to toggle file input -->
+<script>
+    function toggleMediaInput() {
+        const type = document.getElementById('type').value;
+        const mediaInput = document.getElementById('mediaInput');
+        mediaInput.style.display = (type === 'text') ? 'none' : 'block';
+    }
+</script>
+{% endblock body %}

@@ -18,6 +18,7 @@ urlpatterns = [
     path('delete_comment/', delete_comment.as_view(), name='delete_comment'),  # Delete comment view
     path('viewPost/<int:postId>/', views.viewPost, name='viewPost'),  # View post by ID
     path('deletePost/<int:postId>/', views.deletePost, name='deletePost'),  # Delete post by ID
+    path('editPost/<int:postID>/', views.editPost, name='editPost'),  # Edit post by ID
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
  

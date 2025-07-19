@@ -67,12 +67,34 @@
         padding: 2rem;
         width: 100%;
       }
+      .topbar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 250px;
+        z-index: 1000;
+        background-color: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+      }
+      .topbar .nav-link {
+        color: #2c3e50;
+        font-weight: 500;
+      }
+      .topbar .nav-link:hover {
+        color: #007bff;
+        background-color: transparent;
+        transform: none;
+      }
       @media (max-width: 768px) {
         .sidebar {
           width: 200px;
         }
         .content {
           margin-left: 200px;
+        }
+        .topbar {
+          left: 200px;
         }
       }
       @media (max-width: 576px) {
@@ -85,24 +107,33 @@
         .content {
           margin-left: 0;
         }
+        .topbar {
+          left: 0;
+        }
       }
     </style>
-     
   </head>
   <body>
+    <!-- Topbar with Profile -->
+    <nav class="topbar">
+      <ul class="nav justify-content-end">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+        </li>
+      </ul>
+    </nav>
 
     <!-- Static Sidebar -->
     <div class="sidebar">
       <h5>My Sidebar</h5>
       <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
       </ul>
     </div>
 
     <!-- Main Content Area -->
-    <div class="content">
+    <div class="content mt-5">
       {% block body %}{% endblock %}
     </div>
 

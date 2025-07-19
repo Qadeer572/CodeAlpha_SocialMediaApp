@@ -7,6 +7,8 @@ from .models import Post, Comment, Followers, profile
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
+from rest_framework import status
+from users.forms import UserLoginForm
 
 # Create your views here.
 
@@ -19,31 +21,35 @@ def home(request):
         for post in following:
             profile_v = profile.objects.filter(user=post.user).first()
             liked = post.likes.filter(id=request.user.id).exists()
+            comments = Comment.objects.filter(post=post).order_by('-created_at')
             following_post.append({
                 'post': post,
                 'profile': profile_v,
                 'liked': liked,
+                'comments':comments,
             })
+
         post_list= Post.objects.exclude(user=request.user).order_by('-created_at')
         for post1 in post_list:
             profile_v = profile.objects.filter(user=post1.user).first()
             liked = post1.likes.filter(id=request.user.id).exists()
-            
+            comments1 = Comment.objects.filter(post=post1).order_by('-created_at')
             posts.append({
                 'post': post1,
                 'profile': profile_v,
                 'liked': liked,
+                'comments':comments1,
             })
-        comments = Comment.objects.all()
+        
         following_list = User.objects.filter(following__follower=request.user)
         return render(request, 'Posts/home.html',{
             'foryou_posts': posts,
             'following_posts':following_post,
-            'comments': comments,
             'following_list': following_list,
         })
     else:
-        return render(request, 'Posts/home.html')
+        form=UserLoginForm()
+        return render(request, 'users/login.html',{'form': form})
 
 def Myprofile(request):
     profile_v= profile.objects.filter(user=request.user).first()  
@@ -163,4 +169,55 @@ class followUser(APIView):
 
         except User.DoesNotExist:
             return HttpResponse(status=404)        
-        
+
+ 
+
+class add_comment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            post_id = request.data.get('postId')
+            content = request.data.get('content')
+
+            # Validate input
+            if not post_id or not content:
+                return Response({
+                    "status": False,
+                    "message": "postId and content are required."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            post = Post.objects.get(id=post_id)
+
+            comment = Comment.objects.create(
+                post=post,
+                user=request.user,
+                content=content
+            )
+
+            profile1 = profile.objects.filter(user=request.user).first()
+
+            return Response({
+                "status": True,
+                "message": "Comment added successfully.",
+                "comment": {
+                    "id": comment.id,
+                    "profile_pic": profile1.profile_picture.url if profile1 and profile1.profile_picture else None,
+                    "username": comment.user.username,
+                    "user_id": comment.user.id,
+                    "content": comment.content,
+                    "created_at": comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        except Post.DoesNotExist:
+            return Response({
+                "status": False,
+                "message": "Post not found."
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({
+                "status": False,
+                "message": f"An error occurred: {str(e)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

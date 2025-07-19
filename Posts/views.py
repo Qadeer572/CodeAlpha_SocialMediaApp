@@ -269,3 +269,32 @@ class delete_comment(APIView):
                 "status": False,
                 "message": "Comment not found or you do not have permission to delete this comment."
             }, status=status.HTTP_404_NOT_FOUND)        
+
+
+
+def viewPost(request, postId):
+    if request.user.is_authenticated:
+        try:
+            post = Post.objects.get(id=postId)
+            profile_v = profile.objects.filter(user=post.user).first()
+            liked = post.likes.filter(id=request.user.id).exists()
+            comments = Comment.objects.filter(post=post).order_by('-created_at')
+            return render(request, 'Posts/viewPost.html', {
+                'post': post,
+                'profile': profile_v,
+                'liked': liked,
+                'comments': comments,
+            })
+        except Post.DoesNotExist:
+            return HttpResponse("Post not found.", status=404)
+    else:
+        return HttpResponse("You are not logged in. Please log in to access this page.")
+
+def deletePost(request, postId):
+    if request.user.is_authenticated:
+        try:
+            post = Post.objects.get(id=postId, user=request.user)
+            post.delete()
+            return redirect('/profile/')
+        except Post.DoesNotExist:
+            return HttpResponse("Post not found.", status=404)

@@ -111,10 +111,10 @@
                                 
                                 <!-- Post Actions -->
                                 <div class="d-flex gap-2 mt-auto">
-                                    <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                                    <a href="/viewPost/{{post.id}}" class="btn btn-outline-primary btn-sm">View</a>
                                     {% if user == request.user %}
                                         <a href="#" class="btn btn-outline-secondary btn-sm">Edit</a>
-                                        <form method="POST" action="#" style="display: inline;">
+                                        <form method="POST" action="/deletePost/{{ post.id }}/" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="submit" id="{{ post.id }}" class="btn btn-outline-danger btn-sm">Delete</button>
                                         </form>

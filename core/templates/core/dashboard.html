@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <!-- Profile Section -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="row g-0 align-items-center">
+            <div class="col-md-2 text-center p-3">
+                <img src="{{ data.profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+            </div>
+            <div class="col-md-10">
+                <div class="card-body">
+                    <h4 class="card-title mb-0">{{ data.firstName }} {{ data.lastName }}</h4>
+                    <p class="text-muted mb-1">@{{ data.profile.user.username }}</p>
+                    <p class="mb-0">{{ data.profile.bio }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Summary -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Total Posts</h6>
+                    <p class="h4 text-primary">{{ data.totalPosts }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Total Likes</h6>
+                    <p class="h4 text-success">{{ data.totalLikes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Total Followers</h6>
+                    <p class="h4 text-danger">{{ data.totalFollower }}</p>
+                </div>
+            </div>
+        </div>
+        {% if  user.is_staff %}
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6>Total Users</h6>
+                        <p class="h4 text-warning">{{ data.totalUsers }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+     
+    </div>
+
+    <!-- Staff-only User Table -->
+    {% if user.is_staff %}
+    <div class="mt-4">
+        <h4>All Users</h4>
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Is Staff</th>
+                    <th>Date Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in data.users %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="d-flex align-items-center gap-2">
+                        {% with u.profile.profile_picture.url as profile_pic %}
+                            <img src="{{ profile_pic }}" alt="pic" class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                        {% endwith %}
+                        {{ u.username }}
+                    </td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.is_staff }}</td>
+                    <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock body %}

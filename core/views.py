@@ -1,7 +1,35 @@
 from django.shortcuts import render,redirect
-from Posts.models import profile
+from Posts.models import profile,Post,Followers
+from django.contrib.auth.models import User
 
 # Create your views here.
+
+def dashboard(request):
+    if request.user.is_authenticated:
+        myProfile = profile.objects.get(user=request.user)
+        totalLikes = 0
+        totalPosts = 0
+
+        post = Post.objects.filter(user=request.user)
+        for p in post:
+            totalPosts += 1
+            totalLikes += p.likes.count()
+        totalFollower= Followers.objects.filter(user=request.user).count()    
+        context = {
+            "profile": myProfile,
+            "firstName": request.user.first_name,
+            "lastName": request.user.last_name,
+            "totalPosts": totalPosts,
+            "totalLikes": totalLikes,
+            "totalUsers": User.objects.count(),
+            "totalFollower": totalFollower
+        }
+
+        if request.user.is_staff:
+            context["users"] = User.objects.all()
+
+        return render(request, 'core/dashboard.html', {'data': context})
+
 
 
 def editProfile(request):

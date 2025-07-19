@@ -221,3 +221,51 @@ class add_comment(APIView):
                 "status": False,
                 "message": f"An error occurred: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class edit_comment(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def post(self,request):
+        commentId=request.data.get('commentId')
+        content=request.data.get('content')
+
+        try:
+            comment = Comment.objects.get(id=commentId, user=request.user)
+            comment.content = content
+            comment.save()
+
+            return Response({
+                "status": True,
+                "message": "Comment updated successfully.",
+                "comment": {
+                    "id": comment.id,
+                    "content": comment.content,
+                    "created_at": comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }, status=status.HTTP_200_OK)
+        except Comment.DoesNotExist:
+            return Response({
+                "status": False,
+                "message": "Comment not found or you do not have permission to edit this comment."
+            }, status=status.HTTP_404_NOT_FOUND)
+
+class delete_comment(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def post(self,request):
+        commentId = request.data.get('commentId')
+
+        try:
+            comment = Comment.objects.get(id=commentId, user=request.user)
+            comment.delete()
+
+            return Response({
+                "status": True,
+                "message": "Comment deleted successfully."
+            }, status=status.HTTP_200_OK)
+        except Comment.DoesNotExist:
+            return Response({
+                "status": False,
+                "message": "Comment not found or you do not have permission to delete this comment."
+            }, status=status.HTTP_404_NOT_FOUND)        

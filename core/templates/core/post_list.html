@@ -75,19 +75,19 @@
                                     </div>
                                     <p class="mb-1 mt-1">{{ comment.content }}</p>
                                     {% if comment.user == request.user %}
-                                        <div class="mt-2">
+                                        <div class="mt-2 flex flex-row">
                                             <button class="btn btn-sm btn-outline-secondary edit-comment-btn" 
                                                     data-comment-id="{{ comment.id }}"
                                                     data-comment-content="{{ comment.content }}">
                                                 Edit
                                             </button>
-                                            <form method="POST" action="#" style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                        onclick="return confirm('Are you sure you want to delete this comment?')">
+                                            <form class="delete-comment-form" data-comment-id="{{ comment.id }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn">
                                                     Delete
                                                 </button>
                                             </form>
+                                            
                                         </div>
                                     {% endif %}
                                 </div>
@@ -202,13 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Handle profile picture URL
                     const avatarUrl = data.comment.profile_pic || 'https://via.placeholder.com/32';
                     
-                    // Check if current user can edit/delete this comment
-                    const canEditDelete = (
-                        window.currentUser && 
-                        (window.currentUser.id === data.comment.user_id )
-                    );
                     
-                    const editDeleteButtons = canEditDelete ? `
+                    
+                    const editDeleteButtons= `
                         <div class="mt-2">
                             <button class="btn btn-sm btn-outline-secondary edit-comment-btn" 
                                     data-comment-id="${data.comment.id}"
@@ -223,8 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>
                             </form>
                         </div>
-                    ` : '';
-                    
+                    `;
+                    console.log(editDeleteButtons)
                     newComment.innerHTML = `
                         <div class="d-flex align-items-start">
                             <img src="${avatarUrl}" 
@@ -241,9 +237,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
+                    console.log(newComment)
                     
                     // Add to the top of comments list
-                    commentsList.insertBefore(newComment, commentsList.firstChild);
+                    commentsList.appendChild(newComment);
                     
                     // Update comment count
                     const commentCount = document.getElementById(`comment-count-${postId}`);
@@ -273,6 +270,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${data.message}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
+                        console.log('Success:', data.message);
+                        console.log("form",form);
                         form.parentNode.insertBefore(successMsg, form);
                         
                         // Auto-hide success message
@@ -300,7 +299,101 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // Handle delete comment functionality
+if (!window.deleteListenerAdded) {
+    window.deleteListenerAdded = true;
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-comment-btn')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
 
+            const form = e.target.closest('.delete-comment-form');
+            const commentId = form.dataset.commentId;
+            const commentItem = form.closest('.comment-item');
+            
+            // Find the post ID BEFORE removing the comment item
+            const commentsList = commentItem.closest('[id^="comments-list-"]');
+            let postId = null;
+            
+            if (commentsList) {
+                postId = commentsList.id.replace('comments-list-', '');
+            } else {
+                // Fallback: try to find from comments-section
+                const commentsSection = commentItem.closest('[id^="comments-section-"]');
+                if (commentsSection) {
+                    postId = commentsSection.id.replace('comments-section-', '');
+                }
+            }
+            
+            if (!postId) {
+                console.error('Could not find post ID');
+                alert('Error: Could not identify the post. Please refresh the page.');
+                return;
+            }
+            
+            // Get current comment count BEFORE deletion
+            const commentCountElement = document.getElementById(`comment-count-${postId}`);
+            const currentCount = commentCountElement ? parseInt(commentCountElement.textContent) : 0;
+            
+            console.log('Delete comment ID:', commentId, 'Post ID:', postId, 'Current count:', currentCount);
+            
+            fetch('/delete_comment/', {
+                method: 'POST',
+                body: JSON.stringify({ commentId: commentId }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === true) {
+                    // Remove the comment from the DOM
+                    commentItem.remove();
+
+                    // Update comment count using the stored values
+                    if (commentCountElement) {
+                        const newCount = Math.max(currentCount - 1, 0);
+                        commentCountElement.textContent = newCount;
+
+                        // Update comment button text
+                        const commentToggleBtn = document.querySelector(`[data-bs-target="#comments-section-${postId}"]`);
+                        if (commentToggleBtn) {
+                            commentToggleBtn.innerHTML = `💬 ${newCount} Comment${newCount !== 1 ? 's' : ''}`;
+                        }
+                    }
+
+                    // Show "No comments" message if this was the last comment
+                    const commentsList = document.getElementById(`comments-list-${postId}`);
+                    if (commentsList && commentsList.children.length === 0) {
+                        const noComments = document.createElement('p');
+                        noComments.className = 'text-muted text-center py-3';
+                        noComments.id = `no-comments-${postId}`;
+                        noComments.commentCount=0;
+                        noComments.textContent = 'No comments yet. Be the first to comment!';
+                        commentsList.appendChild(noComments);
+                    }
+                    
+                    console.log('Comment deleted successfully, new count:', commentCountElement ? commentCountElement.textContent : 'N/A');
+                } else {
+                    console.error('Delete failed:', data);
+                    alert('Failed to delete comment: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Delete Error:', error);
+                alert('Error deleting comment. Please try again. ' + error.message);
+            });
+        }
+    });
+}
     // Handle edit comment functionality
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('edit-comment-btn')) {
@@ -339,9 +432,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveBtn.disabled = true;
                 saveBtn.textContent = 'Saving...';
                 
-                fetch(`/edit-comment/${commentId}/`, {
+                fetch(`/edit_comment/`, {
                     method: 'POST',
-                    body: JSON.stringify({ content: newContent }),
+                    body: JSON.stringify({ 
+                        commentId: commentId,
+                        content: newContent
+                     }),
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -349,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.status) {
                         contentParagraph.innerHTML = newContent;
                         e.target.dataset.commentContent = newContent;
                         buttonContainer.style.display = 'block';
@@ -367,11 +463,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-            // Handle cancel edit
             cancelEditBtn.addEventListener('click', function() {
-                contentParagraph.innerHTML = originalContent;
+                // Restore the original content (the plain text)
+                contentParagraph.innerHTML = currentContent;
+
+                // Show edit/delete buttons again
                 buttonContainer.style.display = 'block';
             });
+
         }
     });
 });

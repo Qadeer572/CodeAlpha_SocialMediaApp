@@ -3,7 +3,7 @@ from django.contrib import admin
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from Posts.views import likePost,followUser,add_comment
+from Posts.views import likePost,followUser,add_comment,edit_comment,delete_comment
 
 urlpatterns = [
     path('',views.home, name='home'),  # Login view
@@ -14,6 +14,8 @@ urlpatterns = [
     path('followingList/', views.followingList, name='followingList'),  # Following list view
     path('followersList/', views.followersList, name='followersList'),  # Followers list view
     path('add_comment/', add_comment.as_view(), name='add_comment'),  # Add comment view
+    path('edit_comment/', edit_comment.as_view(), name='edit_comment'),  # Edit comment view
+    path('delete_comment/', delete_comment.as_view(), name='delete_comment'),  # Delete comment view
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
  

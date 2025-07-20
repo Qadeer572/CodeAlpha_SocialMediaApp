@@ -129,8 +129,27 @@
       <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+      
+        <!-- Pages Dropdown -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#pagesMenu" role="button" aria-expanded="false" aria-controls="pagesMenu">
+            Pages
+          </a>
+          <div class="collapse ps-3" id="pagesMenu">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'register' %}">Signup</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      
         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
       </ul>
+      
     </div>
 
     <!-- Main Content Area -->

@@ -71,7 +71,16 @@ def followersList(request):
     if request.user.is_authenticated:
         followers = Followers.objects.filter(user=request.user)
         follower_users = [f.follower for f in followers]
-        profiles = profile.objects.filter(user__in=follower_users)
+        profiles1 = profile.objects.filter(user__in=follower_users)
+        profiles=[]
+        for profile1 in profiles1:
+            if profile1.user != request.user:
+                profiles.append({
+                    "profile":profile1,
+                    "isFollowing": Followers.objects.filter(user=profile1.user, follower=request.user).exists(),
+                    "TotalFollower": Followers.objects.filter(user=profile1.user).count(),
+                    })
+
         following= Followers.objects.filter(follower=request.user)
         return render(request, 'Posts/followerList.html', {'profiles': profiles, 'following': following})
     else:
@@ -86,6 +95,7 @@ def followingList(request):
             if profile1.user != request.user:
                 profiles.append({
                     "profile":profile1,
+                    "isFollowing": Followers.objects.filter(user=profile1.user, follower=request.user).exists(),
                     "TotalFollower": Followers.objects.filter(user=profile1.user).count(),
                     })
         return render(request, 'Posts/followingList.html', {'profiles': profiles})

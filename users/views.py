@@ -51,4 +51,16 @@ def register(request):
     return render(request, 'users/signup.html', {'form': form})
 
 
- 
+def suggestedAccount(request):
+    if request.user.is_authenticated:
+        current_user = request.user
+        following_users = current_user.following.all().values_list('user', flat=True)
+        users = User.objects.exclude(id__in=following_users).exclude(id=current_user.id)
+        
+        profiles = profile.objects.filter(user__in=users)
+        suggested_users = {
+            'profiles': profiles
+        }
+        return render(request, 'users/suggested_accounts.html', {'suggested': suggested_users})
+    else:
+        return redirect('/users/login')
